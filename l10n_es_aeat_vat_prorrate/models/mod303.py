@@ -32,8 +32,8 @@ class L10nEsAeatMod303Report(models.Model):
              u"prorrata.")
     vat_prorrate_type = fields.Selection(
         [('none', 'None'),
-         ('general', 'General prorrate'), ],
-        # ('special', 'Special prorrate')],
+         ('general', 'General prorrate'),
+        ('special', 'Special prorrate')],
         readonly=True, states={'draft': [('readonly', False)]},
         string="VAT prorrate type", default='none', required=True)
     vat_prorrate_percent = fields.Float(
@@ -104,6 +104,19 @@ class L10nEsAeatMod303Report(models.Model):
         if (self.vat_prorrate_type == 'general' and
                 map_line.field_number in PRORRATE_TAX_LINE_MAPPING.keys()):
             res['amount'] *= self.vat_prorrate_percent / 100
+        elif (self.vat_prorrate_type == 'special' and
+                map_line.field_number in [29, 41]):
+            if map_line.field_number == 29:
+                move_lines_prorr = self._get_tax_code_lines(
+                    ['SOICC21PRORR'], periods=self.periods)
+            elif map_line.field_number == 41:
+                move_lines_prorr = self._get_tax_code_lines(
+                    ['RDDSC21BPRORR'], periods=self.periods)
+            amount_prorr = sum(move_lines_prorr.mapped('tax_amount'))
+            print(map_line.field_number)
+            print(amount_prorr)
+            res['amount'] = res['amount'] + amount_prorr * (
+                (self.vat_prorrate_percent / 100) - 1)
         return res
 
     @api.multi
