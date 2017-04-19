@@ -113,8 +113,6 @@ class L10nEsAeatMod303Report(models.Model):
                 move_lines_prorr = self._get_tax_code_lines(
                     ['RDDSC21BPRORR'], periods=self.periods)
             amount_prorr = sum(move_lines_prorr.mapped('tax_amount'))
-            print(map_line.field_number)
-            print(amount_prorr)
             res['amount'] = res['amount'] + amount_prorr * (
                 (self.vat_prorrate_percent / 100) - 1)
         return res
