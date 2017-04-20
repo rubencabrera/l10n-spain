@@ -193,7 +193,7 @@ class L10nEsAeatMod303Report(models.Model):
 
     @api.onchange('result_type')
     def onchange_result_type(self):
-        if self.result_type != 'B':
+        if self.result_type != 'D':
             self.compensate = False
 
     @api.multi
